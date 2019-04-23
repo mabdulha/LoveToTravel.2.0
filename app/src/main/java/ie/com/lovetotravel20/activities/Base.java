@@ -39,7 +39,7 @@ public class Base extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
                 finish();
                 Intent intentLogout = new Intent(this, Login.class);
-               this.startActivity(intentLogout);
+                this.startActivity(intentLogout);
                 return true;
             case R.id.menu_search:
                 Intent intentSearch = new Intent(this, Search.class);
