@@ -34,7 +34,8 @@ public class GoogleAuthentication extends Base {
     private SignInButton btn_google_login;
     private GoogleSignInClient mGoogleSignInClient;
     private final int RC_SIGN_IN = 123;
-    FirebaseAuth.AuthStateListener mAuthListener;
+    FirebaseUser mUser;
+//    FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,23 +43,24 @@ public class GoogleAuthentication extends Base {
         setContentView(R.layout.activity_google_authentication);
 
         mAuth = FirebaseAuth.getInstance();
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
 
         btn_google_login = (SignInButton) findViewById(R.id.sign_in_button);
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
+       /* mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (mAuth.getCurrentUser() != null) {
+                if (mUser != null) {
 
                     Intent intent = new Intent(GoogleAuthentication.this, Home.class);
                     startActivity(intent);
                 }
             }
-        };
+        };*/
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("819844712045-q2rqm1pdp1fitimdgt8ujaclto4h5chl.apps.googleusercontent.com")
+                .requestIdToken("864845900464-sl1vav3j5c7vohuakgc2sd1g04kl0a7b.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
 
@@ -77,7 +79,8 @@ public class GoogleAuthentication extends Base {
     protected void onStart() {
         super.onStart();
 
-        mAuth.addAuthStateListener(mAuthListener);
+        /*FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(null);*/
     }
 
     private void signIn() {

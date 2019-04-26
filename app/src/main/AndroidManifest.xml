@@ -43,7 +43,7 @@
             android:label="@string/title_activity_home"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.Add" />
-        <activity android:name=".authentication.Login">
+        <activity android:name=".authentication.GoogleAuthentication">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

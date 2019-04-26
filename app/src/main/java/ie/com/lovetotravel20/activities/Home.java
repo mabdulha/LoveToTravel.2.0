@@ -21,8 +21,12 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Objects;
@@ -38,6 +42,8 @@ public class Home extends Base
 
     RecyclerView journalView;
     String currentUserId;
+    FirebaseUser mUser;
+    private GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
@@ -47,24 +53,45 @@ public class Home extends Base
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        /*mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (mUser == null) {
+
+                    Intent intent = new Intent(Home.this, Login.class);
+                    startActivity(intent);
+                }
+            }
+        };*/
+
+//        if (mUser == null) {
+//
+//            Intent intent = new Intent(Home.this, GoogleAuthentication.class);
+//            startActivity(intent);
+//        }
         journalView = (RecyclerView) findViewById(R.id.rv_journal_list);
         journalView.setHasFixedSize(true);
         journalView.setLayoutManager(new LinearLayoutManager(this));
 
         mAuth = FirebaseAuth.getInstance();
-        currentUserId = mAuth.getCurrentUser().getUid();
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (mUser != null) {
+            currentUserId = mUser.getUid();
+        }
+        else {
+            Intent intent = new Intent(Home.this, GoogleAuthentication.class);
+            startActivity(intent);
+        }
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("journals").child(currentUserId);
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (mAuth.getCurrentUser() == null) {
+        // Configure Google Sign In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("864845900464-sl1vav3j5c7vohuakgc2sd1g04kl0a7b.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
 
-                    Intent intent = new Intent(Home.this, GoogleAuthentication.class);
-                    startActivity(intent);
-                }
-            }
-        };
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -74,6 +101,7 @@ public class Home extends Base
                 startActivity(new Intent(Home.this, Add.class));
             }
         });
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -86,10 +114,21 @@ public class Home extends Base
     }
 
     @Override
+    protected void onRestart() {
+
+        // TODO Auto-generated method stub
+        super.onRestart();
+        Intent i = new Intent(Home.this, Home.class);  //your class
+        startActivity(i);
+        finish();
+
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
-        //mAuth.addAuthStateListener(mAuthListener);
+//        mAuth.addAuthStateListener(mAuthListener);
 
         FirebaseRecyclerAdapter<Journal, JournalViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Journal, JournalViewHolder>(
                 Journal.class,
@@ -205,9 +244,8 @@ public class Home extends Base
             Intent intentMaps = new Intent(this, GoogleMaps.class);
             startActivity(intentMaps);
         } else if (id == R.id.nav_logout) {
-            mAuth.signOut();
-            finish();
-            Intent intentLogout = new Intent(this, Login.class);
+            mGoogleSignInClient.signOut();
+            Intent intentLogout = new Intent(this, GoogleAuthentication.class);
             this.startActivity(intentLogout);
             return true;
         }
