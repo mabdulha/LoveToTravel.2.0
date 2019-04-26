@@ -25,13 +25,13 @@
     <item android:title="Action">
         <menu>
             <item
-                android:id="@+id/nav_logout"
-                android:icon="@drawable/ic_logout"
-                android:title="Logout" />
-            <item
                 android:id="@+id/nav_map"
                 android:icon="@drawable/ic_menu_map"
                 android:title="Open Google Maps" />
+            <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_logout"
+            android:title="Logout" />
         </menu>
     </item>
 

@@ -55,7 +55,7 @@ public class Home extends Base
         currentUserId = mAuth.getCurrentUser().getUid();
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("journals").child(currentUserId);
 
-        /*mAuthListener = new FirebaseAuth.AuthStateListener() {
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (mAuth.getCurrentUser() == null) {
@@ -64,7 +64,7 @@ public class Home extends Base
                     startActivity(intent);
                 }
             }
-        };*/
+        };
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -199,18 +199,17 @@ public class Home extends Base
         } else if (id == R.id.nav_search) {
             Intent intentSearch = new Intent(Home.this, Search.class);
             startActivity(intentSearch);
-
         } else if (id == R.id.nav_image) {
 
+        } else if (id == R.id.nav_map) {
+            Intent intentMaps = new Intent(this, GoogleMaps.class);
+            startActivity(intentMaps);
         } else if (id == R.id.nav_logout) {
             mAuth.signOut();
             finish();
             Intent intentLogout = new Intent(this, Login.class);
             this.startActivity(intentLogout);
             return true;
-        } else if (id == R.id.nav_map) {
-            Intent intentMaps = new Intent(this, GoogleMaps.class);
-            startActivity(intentMaps);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
