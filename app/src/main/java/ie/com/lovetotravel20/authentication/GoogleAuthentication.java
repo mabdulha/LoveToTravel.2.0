@@ -118,13 +118,14 @@ public class GoogleAuthentication extends Base {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         if (acct != null) {
             String personName = acct.getDisplayName();
-            String familyName = acct.getFamilyName();
             String personEmail = acct.getEmail();
             String personPhoto = acct.getPhotoUrl().toString();
 
             GoogleUser googleUser = new GoogleUser(personName, personEmail, personPhoto, mUser.getUid());
             String googleUserId = mDatabaseRef.push().getKey();
-            mDatabaseRef.child(googleUserId).setValue(googleUser);
+            if (googleUserId != null) {
+                mDatabaseRef.child(googleUserId).setValue(googleUser);
+            }
         }
     }
 }

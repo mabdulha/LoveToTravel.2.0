@@ -107,9 +107,9 @@ public class Home extends Base
 
         View header = navigationView.getHeaderView(0);
 
+        headerImage = (ImageView) header.findViewById(R.id.nav_header_imageView);
         headerName = (TextView) header.findViewById(R.id.nav_header_tv_name);
         headerEmail = (TextView) header.findViewById(R.id.nav_header_tv_email);
-        headerImage = (ImageView) header.findViewById(R.id.nav_header_imageView);
 
         FirebaseDatabase.getInstance().getReference("users").child(mUser.getUid())
                 .addValueEventListener(new ValueEventListener() {
@@ -123,13 +123,12 @@ public class Home extends Base
                             String userImage = (String) dataSnapshot.child("photoURL").getValue();*/
                             GoogleUser googleUser = dataSnapshot.getValue(GoogleUser.class);
                             if (googleUser != null) {
-                                Picasso.get().load(googleUser.getPhotoUrl())
-                                        .resize(75,75)
-                                        .centerCrop()
-                                        .into(headerImage);
 
                                 headerName.setText(googleUser.getName());
                                 headerEmail.setText(googleUser.getEmail());
+                                Picasso.get().load(googleUser.getPhotoUrl())
+                                        .centerCrop()
+                                        .into(headerImage);
                             }
                         }
                     }
