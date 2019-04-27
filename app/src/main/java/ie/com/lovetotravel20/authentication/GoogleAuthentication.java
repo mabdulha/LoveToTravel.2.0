@@ -1,14 +1,10 @@
 package ie.com.lovetotravel20.authentication;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -24,10 +20,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import ie.com.lovetotravel20.R;
 import ie.com.lovetotravel20.activities.Base;
 import ie.com.lovetotravel20.activities.Home;
+import ie.com.lovetotravel20.models.GoogleUser;
 
 public class GoogleAuthentication extends Base {
 
@@ -35,7 +35,6 @@ public class GoogleAuthentication extends Base {
     private GoogleSignInClient mGoogleSignInClient;
     private final int RC_SIGN_IN = 123;
     FirebaseUser mUser;
-//    FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,19 +43,9 @@ public class GoogleAuthentication extends Base {
 
         mAuth = FirebaseAuth.getInstance();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference("users").child(mUser.getUid());
 
         btn_google_login = (SignInButton) findViewById(R.id.sign_in_button);
-
-       /* mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (mUser != null) {
-
-                    Intent intent = new Intent(GoogleAuthentication.this, Home.class);
-                    startActivity(intent);
-                }
-            }
-        };*/
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -73,14 +62,6 @@ public class GoogleAuthentication extends Base {
                 signIn();
             }
         });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        /*FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(null);*/
     }
 
     private void signIn() {
@@ -101,6 +82,7 @@ public class GoogleAuthentication extends Base {
                 firebaseAuthWithGoogle(account);
                 Intent intent = new Intent(getApplicationContext(), Home.class);
                 startActivity(intent);
+                updateUI(mUser);
             } catch (ApiException e) {
                 // Google Sign In failed
                 Toast.makeText(this, "Sign in Failed", Toast.LENGTH_SHORT).show();
@@ -136,10 +118,13 @@ public class GoogleAuthentication extends Base {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         if (acct != null) {
             String personName = acct.getDisplayName();
+            String familyName = acct.getFamilyName();
             String personEmail = acct.getEmail();
-            Uri personPhoto = acct.getPhotoUrl();
+            String personPhoto = acct.getPhotoUrl().toString();
 
-            Toast.makeText(this, "Name of user is " + personName + " email is: " + personEmail, Toast.LENGTH_SHORT).show();
+            GoogleUser googleUser = new GoogleUser(personName, personEmail, personPhoto, mUser.getUid());
+            String googleUserId = mDatabaseRef.push().getKey();
+            mDatabaseRef.child(googleUserId).setValue(googleUser);
         }
     }
 }

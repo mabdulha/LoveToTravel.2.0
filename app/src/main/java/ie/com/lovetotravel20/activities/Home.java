@@ -18,6 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -27,13 +29,19 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
 
 import ie.com.lovetotravel20.R;
 import ie.com.lovetotravel20.authentication.GoogleAuthentication;
 import ie.com.lovetotravel20.authentication.Login;
+import ie.com.lovetotravel20.models.GoogleUser;
 import ie.com.lovetotravel20.models.Journal;
 import ie.com.lovetotravel20.viewholder.JournalViewHolder;
 
@@ -44,7 +52,8 @@ public class Home extends Base
     String currentUserId;
     FirebaseUser mUser;
     private GoogleSignInClient mGoogleSignInClient;
-    FirebaseAuth.AuthStateListener mAuthListener;
+    TextView headerName, headerEmail;
+    ImageView headerImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,22 +62,6 @@ public class Home extends Base
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (mUser == null) {
-
-                    Intent intent = new Intent(Home.this, Login.class);
-                    startActivity(intent);
-                }
-            }
-        };*/
-
-//        if (mUser == null) {
-//
-//            Intent intent = new Intent(Home.this, GoogleAuthentication.class);
-//            startActivity(intent);
-//        }
         journalView = (RecyclerView) findViewById(R.id.rv_journal_list);
         journalView.setHasFixedSize(true);
         journalView.setLayoutManager(new LinearLayoutManager(this));
@@ -111,6 +104,41 @@ public class Home extends Base
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View header = navigationView.getHeaderView(0);
+
+        headerName = (TextView) header.findViewById(R.id.nav_header_tv_name);
+        headerEmail = (TextView) header.findViewById(R.id.nav_header_tv_email);
+        headerImage = (ImageView) header.findViewById(R.id.nav_header_imageView);
+
+        FirebaseDatabase.getInstance().getReference("users").child(mUser.getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        if(dataSnapshot.getValue() != null) {
+
+                            /*String userName = (String) dataSnapshot.child("name").getValue();
+                            String userEmail = (String) dataSnapshot.child("email").getValue();
+                            String userImage = (String) dataSnapshot.child("photoURL").getValue();*/
+                            GoogleUser googleUser = dataSnapshot.getValue(GoogleUser.class);
+                            if (googleUser != null) {
+                                Picasso.get().load(googleUser.getPhotoUrl())
+                                        .resize(75,75)
+                                        .centerCrop()
+                                        .into(headerImage);
+
+                                headerName.setText(googleUser.getName());
+                                headerEmail.setText(googleUser.getEmail());
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     @Override
@@ -201,28 +229,6 @@ public class Home extends Base
             super.onBackPressed();
         }
     }
-
-   /* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
