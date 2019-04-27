@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.Camera">
+
+    <ImageView
+        android:id="@+id/camera_image_preview"
+        android:layout_width="match_parent"
+        android:layout_height="515dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/no_image"
+        android:layout_marginTop="10dp"
+        android:contentDescription="@string/image_preview" />
+
+    <Button
+        android:id="@+id/camera_btn_capture"
+        android:layout_below="@+id/camera_image_preview"
+        android:layout_width="match_parent"
+        android:text="Capture Image"
+        android:background="@drawable/btn_search"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/camera_btn_store"
+        android:layout_below="@+id/camera_btn_capture"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:text="Save Image"
+        android:background="@drawable/btn_search"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

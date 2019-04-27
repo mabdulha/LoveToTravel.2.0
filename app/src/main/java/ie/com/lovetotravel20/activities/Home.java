@@ -69,12 +69,14 @@ public class Home extends Base
 
         mAuth = FirebaseAuth.getInstance();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
+
         if (mUser != null) {
             currentUserId = mUser.getUid();
         }
         else {
             Intent intent = new Intent(Home.this, GoogleAuthentication.class);
             startActivity(intent);
+            finish();
         }
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("journals").child(currentUserId);
 
@@ -215,17 +217,15 @@ public class Home extends Base
             Intent intentSearch = new Intent(Home.this, Search.class);
             startActivity(intentSearch);
         } else if (id == R.id.nav_image) {
-
+            Intent intentCamera = new Intent(this, Camera.class);
+            startActivity(intentCamera);
         } else if (id == R.id.nav_map) {
             Intent intentMaps = new Intent(this, GoogleMaps.class);
             startActivity(intentMaps);
         } else if (id == R.id.nav_logout) {
             mGoogleSignInClient.signOut();
-            Intent intentLogout = new Intent(getApplicationContext(), GoogleAuthentication.class);
-            intentLogout.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Home.this.finish();
-            this.startActivity(intentLogout);
-            return true;
+            Intent intent = new Intent(this, GoogleAuthentication.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -25,9 +25,6 @@ public class JournalView extends Base {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.journal_view);
 
-        /*Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);*/
-
         setTitle("Journal");
 
         mKey = getIntent().getExtras().getString("journal_id");
