@@ -29,13 +29,13 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 
 import ie.com.lovetotravel20.R;
+import ie.com.lovetotravel20.models.Image;
 
 public class Camera extends Base {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     ImageView imagePreview;
     Button btnCapture, btnStore;
-    private Uri imageUri;
     Bitmap image;
 
     FirebaseUser mUser;
@@ -62,6 +62,7 @@ public class Camera extends Base {
 
         mStorage = FirebaseStorage.getInstance();
         mStorageRef = mStorage.getReference("image").child(currentUserId);
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference("Images").child(currentUserId);
 
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,14 +98,27 @@ public class Camera extends Base {
         image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 
         byte[] bytes = baos.toByteArray();
-        StorageReference imageReference = mStorageRef.child("image/" + System.currentTimeMillis());
+        final StorageReference imageReference = mStorageRef.child("images/" + System.currentTimeMillis());
+
+        //https://stackoverflow.com/questions/52123204/when-ever-i-use-firebase-method-to-retrieve-download-url-from-firebase-storage
         imageReference.putBytes(bytes).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                Toast.makeText(Camera.this, "Image upload successful", Toast.LENGTH_SHORT).show();
-                Intent intentHome = new Intent(Camera.this, Home.class);
-                startActivity(intentHome);
+                imageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+
+                        final String downloadUrl = uri.toString();
+                        Toast.makeText(Camera.this, "Image upload successful", Toast.LENGTH_SHORT).show();
+
+                        Image image = new Image(downloadUrl);
+                        String uploadId = mDatabaseRef.push().getKey();
+                        mDatabaseRef.child(uploadId).setValue(image);
+                        Intent intentHome = new Intent(Camera.this, Home.class);
+                        startActivity(intentHome);
+                    }
+                });
             }
         });
     }
