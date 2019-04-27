@@ -36,13 +36,15 @@
             android:name=".activities.GoogleMaps"
             android:label="@string/title_activity_maps"></activity>
         <activity android:name=".activities.Search" />
-        <activity android:name=".activities.Update" />
+        <activity android:name=".activities.Update"
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
         <activity android:name=".activities.JournalView" />
         <activity
             android:name=".activities.Home"
             android:label="@string/title_activity_home"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.Add" />
+        <activity android:name=".activities.Add"
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
         <activity android:name=".authentication.GoogleAuthentication"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>

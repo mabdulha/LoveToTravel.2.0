@@ -44,6 +44,7 @@ import ie.com.lovetotravel20.authentication.Login;
 import ie.com.lovetotravel20.models.GoogleUser;
 import ie.com.lovetotravel20.models.Journal;
 import ie.com.lovetotravel20.viewholder.JournalViewHolder;
+import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 public class Home extends Base
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -111,51 +112,20 @@ public class Home extends Base
         headerName = (TextView) header.findViewById(R.id.nav_header_tv_name);
         headerEmail = (TextView) header.findViewById(R.id.nav_header_tv_email);
 
-        FirebaseDatabase.getInstance().getReference("users").child(mUser.getUid())
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+        headerName.setText(mUser.getDisplayName());
+        headerEmail.setText(mUser.getEmail());
 
-                        if(dataSnapshot.getValue() != null) {
-
-                            /*String userName = (String) dataSnapshot.child("name").getValue();
-                            String userEmail = (String) dataSnapshot.child("email").getValue();
-                            String userImage = (String) dataSnapshot.child("photoURL").getValue();*/
-                            GoogleUser googleUser = dataSnapshot.getValue(GoogleUser.class);
-                            if (googleUser != null) {
-
-                                headerName.setText(googleUser.getName());
-                                headerEmail.setText(googleUser.getEmail());
-                                Picasso.get().load(googleUser.getPhotoUrl())
-                                        .centerCrop()
-                                        .into(headerImage);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-    }
-
-    @Override
-    protected void onRestart() {
-
-        // TODO Auto-generated method stub
-        super.onRestart();
-        Intent i = new Intent(Home.this, Home.class);  //your class
-        startActivity(i);
-        finish();
-
+        Picasso.get()
+                .load(mUser.getPhotoUrl())
+                .transform(new CropCircleTransformation())
+                .resize(75,75)
+                .centerCrop()
+                .into(headerImage);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-//        mAuth.addAuthStateListener(mAuthListener);
 
         FirebaseRecyclerAdapter<Journal, JournalViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Journal, JournalViewHolder>(
                 Journal.class,
@@ -236,7 +206,8 @@ public class Home extends Base
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            // Handle the camera action
+            Intent intentHome = new Intent(getApplicationContext(), Home.class);
+            startActivity(intentHome);
         } else if (id == R.id.nav_add) {
             Intent intentAdd = new Intent(Home.this, Add.class);
             startActivity(intentAdd);
@@ -250,7 +221,9 @@ public class Home extends Base
             startActivity(intentMaps);
         } else if (id == R.id.nav_logout) {
             mGoogleSignInClient.signOut();
-            Intent intentLogout = new Intent(this, GoogleAuthentication.class);
+            Intent intentLogout = new Intent(getApplicationContext(), GoogleAuthentication.class);
+            intentLogout.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Home.this.finish();
             this.startActivity(intentLogout);
             return true;
         }
