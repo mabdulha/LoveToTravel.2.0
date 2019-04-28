@@ -1,24 +1,18 @@
 package ie.com.lovetotravel20.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -46,6 +40,9 @@ public class Camera extends AppCompatActivity {
     DatabaseReference mDatabaseRef;
     String currentUserId;
 
+    // This will be used to check if an image has been take so we can upload to firebase storage
+    boolean imageVerify = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,8 +58,8 @@ public class Camera extends AppCompatActivity {
         currentUserId = mUser.getUid();
 
         mStorage = FirebaseStorage.getInstance();
-        mStorageRef = mStorage.getReference("image").child(currentUserId);
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference("Images").child(currentUserId);
+        mStorageRef = mStorage.getReference("images").child(currentUserId);
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference("images").child(currentUserId);
 
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +73,13 @@ public class Camera extends AppCompatActivity {
         btnStore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submit();
+                // If imageVerify is true, we can submit the image onto firebase storage
+                if(imageVerify) {
+                    submit();
+                }
+                else {
+                    Toast.makeText(Camera.this, "Please Snap a picture before uploading", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -86,7 +89,15 @@ public class Camera extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
-        image = (Bitmap) data.getExtras().get("data");
+        if (data != null) {
+            image = (Bitmap) data.getExtras().get("data");
+            // Setting the value true so we can test that there is an image available
+            imageVerify = true;
+        }
+        else {
+            Intent intent = new Intent(this, Camera.class);
+            startActivity(intent);
+        }
         imagePreview.setImageBitmap(image);
     }
 
@@ -113,7 +124,9 @@ public class Camera extends AppCompatActivity {
 
                         Image image = new Image(downloadUrl);
                         String uploadId = mDatabaseRef.push().getKey();
-                        mDatabaseRef.child(uploadId).setValue(image);
+                        if (uploadId != null) {
+                            mDatabaseRef.child(uploadId).setValue(image);
+                        }
                         Intent intentHome = new Intent(Camera.this, Home.class);
                         startActivity(intentHome);
                     }

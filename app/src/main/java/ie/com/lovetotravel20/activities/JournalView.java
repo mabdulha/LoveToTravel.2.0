@@ -3,7 +3,6 @@ package ie.com.lovetotravel20.activities;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,8 +33,8 @@ public class JournalView extends AppCompatActivity {
         mKey = getIntent().getExtras().getString("journal_id");
 
         mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference("journals").child(user.getUid());
+        FirebaseUser mUser = mAuth.getCurrentUser();
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference("journals").child(mUser.getUid());
 
         vTitle = (TextView) findViewById(R.id.tv_view_Title);
         vEntry = (TextView) findViewById(R.id.tv_view_entry);

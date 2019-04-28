@@ -223,7 +223,10 @@ public class Home extends AppCompatActivity
             Intent intentMaps = new Intent(this, GoogleMaps.class);
             startActivity(intentMaps);
         } else if (id == R.id.nav_logout) {
-            signout();
+            signOut();
+        } else if (id == R.id.nav_image_gallery) {
+            Intent intentGallery = new Intent(this, ImageGallery.class);
+            startActivity(intentGallery);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -232,7 +235,7 @@ public class Home extends AppCompatActivity
     }
 
     //https://stackoverflow.com/questions/36659753/google-login-uses-same-account-everytime-users-login
-    public void signout() {
+    public void signOut() {
 
         FirebaseAuth.getInstance().signOut();
         mGoogleSignInClient.signOut();

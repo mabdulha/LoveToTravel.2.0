@@ -70,11 +70,6 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
-        /*// Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
-
         // Check to see if the app has permission to access the location of the device
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
