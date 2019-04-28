@@ -7,4 +7,11 @@
     <color name="Anakiwa">#7AEEFF</color>
     <color name="transparent">#00000000</color>
     <color name="white">#ffffff</color>
+
+    <item name="transparent_bg" type="color">#00000000</item>
+    <item name="color_bg" type="color">#62BECC</item>
+    <integer-array name="androidcolors">
+        <item>@color/transparent_bg</item>
+        <item>@color/color_bg</item>
+    </integer-array>
 </resources>

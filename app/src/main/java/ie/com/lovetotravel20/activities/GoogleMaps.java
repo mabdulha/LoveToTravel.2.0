@@ -9,6 +9,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -37,6 +39,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
     private LocationRequest locationRequest;
     private Marker currentUserLocationMarker;
     private final int Request_Location_Code = 999;
+    ImageButton nearby_places_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +54,17 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-    }
 
+        nearby_places_button = (ImageButton) findViewById(R.id.tourist_attraction_places_btn);
+
+        nearby_places_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //mMap.clear();
+                Toast.makeText(GoogleMaps.this, "Nearby Places", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     /**
      * Manipulates the map once available.
@@ -63,6 +75,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
@@ -92,7 +105,6 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onLocationChanged(Location location) {
 
-        Location lastKnownlocation = location;
         // If the marker is currently already available i.e. the user already has a maker set
         // We will remove that marker
         if(currentUserLocationMarker != null){
@@ -109,7 +121,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
         // Giving the marker a position, title and styling the colour
         MarkerOptions markerOptions = new MarkerOptions()
                 .position(currentLatLng)
-                .title("Your Current Location")
+                .title("You Are Here")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
 
         // Adding the new marker to the map
@@ -137,8 +149,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
         // Creating a location request object to get the location of user
         locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10000) //Setting the interval at 10 seconds in milliseconds
-                .setFastestInterval(10000);
+                .setInterval(1000);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION )== PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
