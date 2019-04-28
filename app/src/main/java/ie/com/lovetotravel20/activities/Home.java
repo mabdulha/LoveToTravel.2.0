@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -16,7 +15,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,35 +24,37 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.Objects;
 
 import ie.com.lovetotravel20.R;
 import ie.com.lovetotravel20.authentication.GoogleAuthentication;
-import ie.com.lovetotravel20.authentication.Login;
-import ie.com.lovetotravel20.models.GoogleUser;
 import ie.com.lovetotravel20.models.Journal;
 import ie.com.lovetotravel20.viewholder.JournalViewHolder;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
-public class Home extends Base
+public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     RecyclerView journalView;
     String currentUserId;
     FirebaseUser mUser;
-    private GoogleSignInClient mGoogleSignInClient;
     TextView headerName, headerEmail;
     ImageView headerImage;
+    FirebaseAuth mAuth;
+    FirebaseAuth.AuthStateListener mAuthListener;
+    DatabaseReference mDatabaseRef;
+    GoogleSignInClient mGoogleSignInClient;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,16 +69,18 @@ public class Home extends Base
 
         mAuth = FirebaseAuth.getInstance();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
+        currentUserId = mUser.getUid();
 
-        if (mUser != null) {
-            currentUserId = mUser.getUid();
-        }
-        else {
-            Intent intent = new Intent(Home.this, GoogleAuthentication.class);
-            startActivity(intent);
-            finish();
-        }
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference("journals").child(currentUserId);
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+                if(firebaseAuth.getCurrentUser() == null) {
+                    Intent intent = new Intent(Home.this, GoogleAuthentication.class);
+                    startActivity(intent);
+                }
+            }
+        };
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -89,6 +91,8 @@ public class Home extends Base
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference("journals").child(currentUserId);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,6 +101,7 @@ public class Home extends Base
                 startActivity(new Intent(Home.this, Add.class));
             }
         });
+
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -123,11 +128,6 @@ public class Home extends Base
                 .resize(75,75)
                 .centerCrop()
                 .into(headerImage);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         FirebaseRecyclerAdapter<Journal, JournalViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Journal, JournalViewHolder>(
                 Journal.class,
@@ -223,13 +223,20 @@ public class Home extends Base
             Intent intentMaps = new Intent(this, GoogleMaps.class);
             startActivity(intentMaps);
         } else if (id == R.id.nav_logout) {
-            mGoogleSignInClient.signOut();
-            Intent intent = new Intent(this, GoogleAuthentication.class);
-            startActivity(intent);
+            signout();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    //https://stackoverflow.com/questions/28128946/caused-by-java-lang-nullpointerexception-attempt-to-invoke-interface-method-on/28129003
+    public void signout() {
+
+        FirebaseAuth.getInstance().signOut();
+        mGoogleSignInClient.signOut();
+        Intent intent = new Intent(this, GoogleAuthentication.class);
+        startActivity(intent);
     }
 }

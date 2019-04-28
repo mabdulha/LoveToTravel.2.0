@@ -3,6 +3,7 @@ package ie.com.lovetotravel20.authentication;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -20,32 +21,43 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import ie.com.lovetotravel20.R;
-import ie.com.lovetotravel20.activities.Base;
 import ie.com.lovetotravel20.activities.Home;
-import ie.com.lovetotravel20.models.GoogleUser;
 
-public class GoogleAuthentication extends Base {
+public class GoogleAuthentication extends AppCompatActivity {
 
-    private SignInButton btn_google_login;
-    private GoogleSignInClient mGoogleSignInClient;
-    private final int RC_SIGN_IN = 123;
-    FirebaseUser mUser;
+    SignInButton btn_google_login;
+    FirebaseAuth mAuth;
+    final static int RC_SIGN_IN = 123;
+    GoogleSignInClient mGoogleSignInClient;
+    FirebaseAuth.AuthStateListener mAuthListener;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_google_authentication);
 
-        mAuth = FirebaseAuth.getInstance();
-        mUser = FirebaseAuth.getInstance().getCurrentUser();
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference("users").child(mUser.getUid());
-
         btn_google_login = (SignInButton) findViewById(R.id.sign_in_button);
+        mAuth = FirebaseAuth.getInstance();
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+                if(firebaseAuth.getCurrentUser() != null) {
+
+                    Intent intent = new Intent(GoogleAuthentication.this, Home.class);
+                    startActivity(intent);
+                }
+            }
+        };
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -80,20 +92,17 @@ public class GoogleAuthentication extends Base {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
-                Intent intent = new Intent(getApplicationContext(), Home.class);
-                startActivity(intent);
-                updateUI(mUser);
             } catch (ApiException e) {
-                // Google Sign In failed
-                Toast.makeText(this, "Sign in Failed", Toast.LENGTH_SHORT).show();
+                // Google Sign In failed, update UI appropriately
+                // ...
+                Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d("TAG", "firebaseAuthWithGoogle:" + acct.getId());
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
 
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -102,30 +111,17 @@ public class GoogleAuthentication extends Base {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("TAG", "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+                            //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("TAG", "signInWithCredential:failure", task.getException());
                             Toast.makeText(GoogleAuthentication.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
-                            updateUI(null);
+                            //updateUI(null);
                         }
+
+                        // ...
                     }
                 });
     }
-
-    private void updateUI(FirebaseUser user) {
-
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
-        if (acct != null) {
-            String personName = acct.getDisplayName();
-            String personEmail = acct.getEmail();
-            String personPhoto = acct.getPhotoUrl().toString();
-
-            GoogleUser googleUser = new GoogleUser(personName, personEmail, personPhoto, mUser.getUid());
-            String googleUserId = mDatabaseRef.push().getKey();
-            if (googleUserId != null) {
-                mDatabaseRef.child(googleUserId).setValue(googleUser);
-            }
-        }
-    }
 }
+

@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -31,7 +32,7 @@ import java.io.ByteArrayOutputStream;
 import ie.com.lovetotravel20.R;
 import ie.com.lovetotravel20.models.Image;
 
-public class Camera extends Base {
+public class Camera extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     ImageView imagePreview;
@@ -41,6 +42,8 @@ public class Camera extends Base {
     FirebaseUser mUser;
     FirebaseStorage mStorage;
     StorageReference mStorageRef;
+    FirebaseAuth mAuth;
+    DatabaseReference mDatabaseRef;
     String currentUserId;
 
     @Override

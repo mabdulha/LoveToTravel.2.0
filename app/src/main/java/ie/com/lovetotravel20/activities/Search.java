@@ -4,16 +4,19 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
@@ -21,12 +24,14 @@ import ie.com.lovetotravel20.R;
 import ie.com.lovetotravel20.viewholder.JournalViewHolder;
 import ie.com.lovetotravel20.models.Journal;
 
-public class Search extends Base {
+public class Search extends AppCompatActivity {
 
     private EditText etSearch;
     private ImageButton btnSearch;
     private RecyclerView rvResult;
     private String currentUserId;
+    FirebaseAuth mAuth;
+    DatabaseReference mDatabaseRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,5 +126,12 @@ public class Search extends Base {
         };
 
         rvResult.setAdapter(firebaseRecyclerAdapter);
+    }
+
+    public void hideSoftKeyboard() {
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
     }
 }

@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.DateFormat;
@@ -22,11 +24,13 @@ import ie.com.lovetotravel20.R;
 import ie.com.lovetotravel20.fragments.DatePickerFragment;
 import ie.com.lovetotravel20.models.Journal;
 
-public class Add extends Base implements DatePickerDialog.OnDateSetListener {
+public class Add extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     EditText etTitle, etEntry;
     TextView tvDate;
     Button btnDate, btnAdd;
+    FirebaseAuth mAuth;
+    DatabaseReference mDatabaseRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
