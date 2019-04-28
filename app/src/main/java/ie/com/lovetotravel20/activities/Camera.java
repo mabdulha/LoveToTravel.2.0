@@ -1,10 +1,14 @@
 package ie.com.lovetotravel20.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -40,13 +44,15 @@ public class Camera extends AppCompatActivity {
     DatabaseReference mDatabaseRef;
     String currentUserId;
 
+    private final int Request_Camera_Code = 999;
+
     // This will be used to check if an image has been take so we can upload to firebase storage
     boolean imageVerify = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
+        setContentView(R.layout.camera);
         setTitle("Camera");
 
         imagePreview = (ImageView) findViewById(R.id.camera_image_preview);
@@ -57,6 +63,8 @@ public class Camera extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         currentUserId = mUser.getUid();
 
+        checkCameraPermission();
+
         mStorage = FirebaseStorage.getInstance();
         mStorageRef = mStorage.getReference("images").child(currentUserId);
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("images").child(currentUserId);
@@ -66,7 +74,9 @@ public class Camera extends AppCompatActivity {
             public void onClick(View v) {
 
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                if(takePictureIntent.resolveActivity(getPackageManager()) != null){
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                }
             }
         });
 
@@ -133,5 +143,24 @@ public class Camera extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    public boolean checkCameraPermission(){
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)){
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Request_Camera_Code);
+            }
+            else {
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Request_Camera_Code);
+            }
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }

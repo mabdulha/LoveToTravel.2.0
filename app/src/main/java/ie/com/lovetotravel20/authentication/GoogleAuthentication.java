@@ -43,7 +43,7 @@ public class GoogleAuthentication extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_google_authentication);
+        setContentView(R.layout.google_authentication);
 
         btn_google_login = (SignInButton) findViewById(R.id.sign_in_button);
         mAuth = FirebaseAuth.getInstance();
