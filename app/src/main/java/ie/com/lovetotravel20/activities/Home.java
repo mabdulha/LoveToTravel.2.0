@@ -231,7 +231,7 @@ public class Home extends AppCompatActivity
         return true;
     }
 
-    //https://stackoverflow.com/questions/28128946/caused-by-java-lang-nullpointerexception-attempt-to-invoke-interface-method-on/28129003
+    //https://stackoverflow.com/questions/36659753/google-login-uses-same-account-everytime-users-login
     public void signout() {
 
         FirebaseAuth.getInstance().signOut();

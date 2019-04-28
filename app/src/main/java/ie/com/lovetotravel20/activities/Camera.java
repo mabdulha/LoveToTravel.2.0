@@ -58,10 +58,7 @@ public class Camera extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-
-        if (mUser != null) {
-            currentUserId = mUser.getUid();
-        }
+        currentUserId = mUser.getUid();
 
         mStorage = FirebaseStorage.getInstance();
         mStorageRef = mStorage.getReference("image").child(currentUserId);
@@ -76,12 +73,12 @@ public class Camera extends AppCompatActivity {
             }
         });
 
-        /*btnStore.setOnClickListener(new View.OnClickListener() {
+        btnStore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                uploadImage();
+                submit();
             }
-        });*/
+        });
 
     }
 
@@ -91,7 +88,6 @@ public class Camera extends AppCompatActivity {
 
         image = (Bitmap) data.getExtras().get("data");
         imagePreview.setImageBitmap(image);
-        submit();
     }
 
 
