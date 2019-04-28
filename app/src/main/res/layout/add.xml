@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -94,37 +94,6 @@
                     />
 
             </LinearLayout>
-
-            <!-- <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Confirm Password"
-                    android:textAllCaps="true"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="@color/white"
-                    android:textSize="15sp" />
-
-                <EditText
-                    android:id="@+id/et_reg_password_confirm"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:textSize="15sp"
-                    android:layout_marginTop="5dp"
-                    android:textColor="@color/white"
-                    android:fontFamily="sans-serif-medium"
-                    android:paddingLeft="15dp"
-                    android:inputType="textPassword"
-                    android:paddingRight="15dp"
-                    android:background="@drawable/et_bg"
-                    />
-
-            </LinearLayout> -->
 
         </LinearLayout>
 
