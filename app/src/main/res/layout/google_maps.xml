@@ -30,6 +30,18 @@
             android:layout_marginTop="10dp"
             />
 
+        <ImageButton
+            android:layout_below="@id/tourist_attraction_places_btn"
+            android:id="@+id/remove_places_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_remove_circle"
+            android:background="@drawable/btn_bg"
+            android:backgroundTint="@color/white"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            />
+
 
     </RelativeLayout>
 

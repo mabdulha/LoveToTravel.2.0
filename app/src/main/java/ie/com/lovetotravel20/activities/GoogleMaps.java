@@ -26,8 +26,16 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import ie.com.lovetotravel20.R;
+import ie.com.lovetotravel20.models.GoogleMapsUser;
 
 public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -39,7 +47,11 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
     private LocationRequest locationRequest;
     private Marker currentUserLocationMarker;
     private final int Request_Location_Code = 999;
-    ImageButton nearby_places_button;
+    FirebaseUser mUser;
+    FirebaseAuth mAuth;
+    DatabaseReference mDatabaseRef;
+    ImageButton nearby_places_button, remove_nearby_places_button;
+    ChildEventListener mChildEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +67,67 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference("map_user");
+
         nearby_places_button = (ImageButton) findViewById(R.id.tourist_attraction_places_btn);
+        remove_nearby_places_button = (ImageButton) findViewById(R.id.remove_places_btn);
 
         nearby_places_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //mMap.clear();
-                Toast.makeText(GoogleMaps.this, "Nearby Places", Toast.LENGTH_SHORT).show();
+
+                mChildEventListener = mDatabaseRef.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                        GoogleMapsUser googleMapsUser = dataSnapshot.getValue(GoogleMapsUser.class);
+                        String name = googleMapsUser.getUsername();
+                        double lat = googleMapsUser.getLatitude();
+                        double lng = googleMapsUser.getLongitude();
+
+                        LatLng latLng = new LatLng(lat,lng);
+
+                        MarkerOptions markerOptions = new MarkerOptions()
+                                .position(latLng)
+                                .title("Recommended by " + name)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+
+                        mMap.addMarker(markerOptions);
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+                Toast.makeText(GoogleMaps.this, "Recommended Places by Users", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        remove_nearby_places_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMap.clear();
+                onMapReady(mMap);
+                Toast.makeText(GoogleMaps.this, "Removed User Recommendations", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -77,7 +143,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
      */
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
 
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
@@ -88,6 +154,31 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+
+                double lat = latLng.latitude;
+                double lng = latLng.longitude;
+
+
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title("Recommended by " + mUser.getDisplayName())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+
+                GoogleMapsUser googleMapsUser = new GoogleMapsUser(mUser.getDisplayName(), lat, lng);
+                String uploadId = mDatabaseRef.push().getKey();
+
+                if(uploadId != null) {
+                    mDatabaseRef.child(uploadId).setValue(googleMapsUser);
+                }
+
+                mMap.addMarker(markerOptions);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
+            }
+        });
 
     }
 
@@ -127,8 +218,8 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
         // Adding the new marker to the map
         currentUserLocationMarker = mMap.addMarker(markerOptions);
 
-        // Moving the camera so it will be at the marker with a zoom set to 16
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 16));
+        // Moving the camera so it will be at the marker with a zoom set
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14));
     }
 
     @Override
@@ -137,7 +228,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
 
         // Getting the current location of user
         if(googleApiClient != null && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
-        PackageManager.PERMISSION_GRANTED) {
+                PackageManager.PERMISSION_GRANTED) {
 
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
@@ -149,7 +240,8 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
         // Creating a location request object to get the location of user
         locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(1000);
+                .setFastestInterval(20000)
+                .setInterval(60000);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION )== PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
