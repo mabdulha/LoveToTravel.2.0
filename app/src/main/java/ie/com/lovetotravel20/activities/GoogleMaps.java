@@ -175,7 +175,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
                 }
 
                 mMap.addMarker(markerOptions);
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
             }
         });
 
@@ -218,7 +218,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
         currentUserLocationMarker = mMap.addMarker(markerOptions);
 
         // Moving the camera so it will be at the marker with a zoom set
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 13));
     }
 
     @Override

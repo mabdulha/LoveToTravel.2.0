@@ -1,10 +1,14 @@
 package ie.com.lovetotravel20.activities;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -56,7 +60,31 @@ public class ImageGallery extends AppCompatActivity {
             @Override
             protected void populateViewHolder(ImageGalleryHolder viewHolder, Image model, int position) {
 
+                final String ref_key = getRef(position).getKey();
+
                 viewHolder.setImage(model.getImageUrl());
+
+                viewHolder.btn_delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        AlertDialog dialog = new AlertDialog.Builder(ImageGallery.this)
+                                .setTitle("Delete Confirmation")
+                                .setMessage("Are you sure you want to delete this image?")
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mDatabaseRef.child(ref_key).removeValue();
+                                        Toast.makeText(ImageGallery.this, "Image has been deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).show();
+                    }
+                });
             }
         };
         imageView.setAdapter(firebaseRecyclerAdapter);

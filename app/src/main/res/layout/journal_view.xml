@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:text="Journal Entry"
         android:padding="15dp"
-        android:textSize="15dp"
+        android:textSize="17dp"
         />
 
 </RelativeLayout>

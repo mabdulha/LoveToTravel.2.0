@@ -154,6 +154,15 @@ public class Home extends AppCompatActivity
                     }
                 });
 
+                viewHolder.btnUpdate.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Home.this, Update.class);
+                        intent.putExtra("journal_id" ,ref_key);
+                        startActivity(intent);
+                    }
+                });
+
                 viewHolder.btnDelete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
