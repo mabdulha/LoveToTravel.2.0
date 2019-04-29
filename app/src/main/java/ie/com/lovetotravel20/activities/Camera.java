@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -14,6 +15,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -22,6 +25,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -43,6 +47,7 @@ public class Camera extends AppCompatActivity {
     FirebaseAuth mAuth;
     DatabaseReference mDatabaseRef;
     String currentUserId;
+    ProgressBar mProgressBar;
 
     private final int Request_Camera_Code = 999;
 
@@ -58,6 +63,7 @@ public class Camera extends AppCompatActivity {
         imagePreview = (ImageView) findViewById(R.id.camera_image_preview);
         btnCapture = (Button) findViewById(R.id.camera_btn_capture);
         btnStore = (Button) findViewById(R.id.camera_btn_store);
+        mProgressBar = (ProgressBar) findViewById(R.id.upload_progress);
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -125,6 +131,14 @@ public class Camera extends AppCompatActivity {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressBar.setProgress(0);
+                    }
+                }, 300);
+
                 imageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
@@ -141,6 +155,14 @@ public class Camera extends AppCompatActivity {
                         startActivity(intentHome);
                     }
                 });
+            }
+        })
+        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+
+                double progress = (100.0 * taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
+                mProgressBar.setProgress((int) progress);
             }
         });
     }

@@ -69,7 +69,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference("map_user");
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference("markers");
 
         nearby_places_button = (ImageButton) findViewById(R.id.tourist_attraction_places_btn);
         remove_nearby_places_button = (ImageButton) findViewById(R.id.remove_places_btn);
@@ -240,8 +240,8 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
         // Creating a location request object to get the location of user
         locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setFastestInterval(20000)
-                .setInterval(60000);
+                .setFastestInterval(2000)
+                .setInterval(6000);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION )== PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
