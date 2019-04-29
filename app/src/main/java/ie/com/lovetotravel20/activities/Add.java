@@ -69,10 +69,11 @@ public class Add extends AppCompatActivity implements DatePickerDialog.OnDateSet
         String title = etTitle.getText().toString().trim();
         String entry = etEntry.getText().toString().trim();
         String date = tvDate.getText().toString().trim();
+        boolean fav = false;
 
         if(title.length() > 0 && entry.length() > 0 && date.length() > 5) {
 
-            Journal journal = new Journal(title, entry, date, false);
+            Journal journal = new Journal(title, entry, date, fav);
             FirebaseUser user = mAuth.getCurrentUser();
             String journalId = mDatabaseRef.push().getKey();
             mDatabaseRef.child(journalId).setValue(journal);

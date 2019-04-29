@@ -154,15 +154,6 @@ public class Home extends AppCompatActivity
                     }
                 });
 
-                viewHolder.btnUpdate.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Home.this, Update.class);
-                        intent.putExtra("journal_id" ,ref_key);
-                        startActivity(intent);
-                    }
-                });
-
                 viewHolder.btnDelete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -223,7 +214,10 @@ public class Home extends AppCompatActivity
             Intent intentMaps = new Intent(this, GoogleMaps.class);
             startActivity(intentMaps);
         } else if (id == R.id.nav_logout) {
-            signOut();
+            FirebaseAuth.getInstance().signOut();
+            mGoogleSignInClient.signOut();
+            Intent intent = new Intent(this, GoogleAuthentication.class);
+            startActivity(intent);
         } else if (id == R.id.nav_image_gallery) {
             Intent intentGallery = new Intent(this, ImageGallery.class);
             startActivity(intentGallery);
@@ -232,14 +226,5 @@ public class Home extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    //https://stackoverflow.com/questions/36659753/google-login-uses-same-account-everytime-users-login
-    public void signOut() {
-
-        FirebaseAuth.getInstance().signOut();
-        mGoogleSignInClient.signOut();
-        Intent intent = new Intent(this, GoogleAuthentication.class);
-        startActivity(intent);
     }
 }

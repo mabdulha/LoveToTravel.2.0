@@ -61,7 +61,6 @@
                 android:textColor="@android:color/white"
                 android:textSize="15sp" />
 
-
             <ImageButton
                 android:backgroundTint="@color/colorPrimary"
                 android:id="@+id/btn_update"

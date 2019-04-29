@@ -10,8 +10,7 @@ import ie.com.lovetotravel20.R;
 
 public class JournalViewHolder extends RecyclerView.ViewHolder {
 
-    public ImageButton btnDelete;
-    public ImageButton btnUpdate;
+    public ImageButton btnDelete, btnUpdate;
 
     public JournalViewHolder(@NonNull View itemView) {
         super(itemView);

@@ -81,7 +81,6 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
                 mChildEventListener = mDatabaseRef.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
                         GoogleMapsUser googleMapsUser = dataSnapshot.getValue(GoogleMapsUser.class);
                         String name = googleMapsUser.getUsername();
                         double lat = googleMapsUser.getLatitude();
@@ -146,7 +145,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
     public void onMapReady(final GoogleMap googleMap) {
 
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         // Check to see if the app has permission to access the location of the device
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -219,7 +218,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
         currentUserLocationMarker = mMap.addMarker(markerOptions);
 
         // Moving the camera so it will be at the marker with a zoom set
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14));
     }
 
     @Override
@@ -239,9 +238,9 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback,
 
         // Creating a location request object to get the location of user
         locationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setFastestInterval(2000)
-                .setInterval(6000);
+                .setInterval(1000)
+                .setFastestInterval(1000)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION )== PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
